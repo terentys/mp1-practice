@@ -17,15 +17,6 @@ std::string Deposit::getFullInfoDeposit() const {
     return type + ": " + oss.str() + "%";
 }
 
-std::string Deposit::toLowerType() const {
-    std::string lowerType;
-    lowerType.reserve(type.length());
-    for (char c : type) {
-        lowerType.push_back(std::tolower(static_cast<unsigned char>(c)));
-    }
-    return lowerType;
-}
-
 Bank::Bank(const std::string& name, const std::string& ownership, const int depositsCount) {
     this->name = name;
     this->ownership = ownership;
@@ -62,7 +53,11 @@ void Bank::stringToDeposit(std::string& string) {
 }
 
 std::string Bank::getFullInfoBank() const {
-
+	std::string result = this->name + ":\n‘орма собственности: " + this->ownership + "\n¬клады:\n";
+	for (int i = 0; i < this->depositsCount; i++) {
+		result += "\t" + this->deposits[i].getFullInfoDeposit() + "\n";
+	}
+	return result;
 }
 
 bool isFloat(const std::string& str) {
@@ -74,4 +69,38 @@ bool isFloat(const std::string& str) {
         return !(iss >> leftover);
     }
     return false;
+}
+
+int Banks::_getCountBanks(std::ifstream& file) {
+	int count;
+	std::string line;
+	while (std::getline(file, line)) {
+		count++;
+	}
+	return count;
+}
+
+void Banks::_stringToBank(std::ifstream& file) {
+	int indexBank = 0;
+	std::string line;
+	while (indexBank < this->countBanks && std::getline(file, line)) {
+
+	}
+}
+
+Banks::Banks(const char* nameFile) {
+	throw std::runtime_error("no realization");
+}
+
+Banks::~Banks() {
+	throw std::runtime_error("no realization");
+}
+
+std::string toLower(const std::string& str) {
+	std::string lowerStr;
+	lowerStr.reserve(str.length());
+	for (char c : str) {
+		lowerStr.push_back(std::tolower(static_cast<unsigned char>(c)));
+	}
+	return lowerStr;
 }

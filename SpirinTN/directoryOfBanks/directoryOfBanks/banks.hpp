@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <fstream>
 
 struct Deposit {
     std::string type;
@@ -12,7 +13,6 @@ struct Deposit {
     Deposit(const std::string& type, const float percent);
 
     std::string getFullInfoDeposit() const;
-    std::string toLowerType() const;
 };
 
 struct Bank {
@@ -31,5 +31,21 @@ struct Bank {
 
 bool isFloat(const std::string& str);
 
+struct Banks {
+	Bank *banks;
+	int countBanks;
+
+	int _getCountBanks(std::ifstream& file);
+	void _stringToBank(std::ifstream& file);
+
+	Banks() {};
+	Banks(const char* nameFile);
+	~Banks();
+
+	std::string getFullLustBanks() const;
+	Bank& searchMaxPercent(const std::string& depositType) const;
+};
+
+std::string toLower(const std::string& str);
 
 #endif
