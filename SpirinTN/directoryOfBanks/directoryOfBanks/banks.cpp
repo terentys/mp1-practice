@@ -31,10 +31,10 @@ Bank::~Bank() {
 void Bank::stringToDeposit(std::string& string) {
     int idx = 0;
     while (true) {
-        int lenDepositSubStr = string.find(";");
+        size_t lenDepositSubStr = string.find(";");
         std::string depositSumStr = lenDepositSubStr != std::string::npos ? string.substr(0, lenDepositSubStr) : string;
 
-        int idxColons = depositSumStr.find(":");
+		size_t idxColons = depositSumStr.find(":");
         if (idxColons == std::string::npos || !isFloat(depositSumStr.substr(idxColons + 1))) {
             throw "Информация о депозитах некорректна!";
         }
@@ -72,7 +72,7 @@ bool isFloat(const std::string& str) {
 }
 
 int Banks::_getCountBanks(std::ifstream& file) {
-	int count;
+	int count = 0;
 	std::string line;
 	while (std::getline(file, line)) {
 		count++;
@@ -83,17 +83,70 @@ int Banks::_getCountBanks(std::ifstream& file) {
 void Banks::_stringToBank(std::ifstream& file) {
 	int indexBank = 0;
 	std::string line;
+	size_t splitIndex;
 	while (indexBank < this->countBanks && std::getline(file, line)) {
+		splitIndex = line.find(";");
+		if (splitIndex == std::string::npos) {
+			throw "Информация о депозитах некорректна!";
+		}
+		this->banks[indexBank].name = line.substr(0, splitIndex);
+		line = line.substr(splitIndex + 1);
 
+		splitIndex = line.find(";");
+		if (splitIndex == std::string::npos) {
+			throw "Информация о депозитах некорректна!";
+		}
+		this->banks[indexBank].ownership = line.substr(0, splitIndex);
+		line = line.substr(splitIndex + 1);
+
+		this->banks[indexBank].stringToDeposit(line);
 	}
 }
 
 Banks::Banks(const char* nameFile) {
-	throw std::runtime_error("no realization");
+	std::ifstream file(nameFile);
+	if (!file) {
+		throw "Не удалось открыть файл!";
+	}
+
+	this->countBanks = this->_getCountBanks(file);
+	file.clear();
+	file.seekg(0, std::ios::beg);
+
+	this->banks = new Bank[this->countBanks];
+	this->_stringToBank(file);
 }
 
 Banks::~Banks() {
-	throw std::runtime_error("no realization");
+	delete[] this->banks;
+}
+
+std::string Banks::getFullListBanks() const {
+	std::string result = "Список банков в файле:\n\n";
+	for (int i = 0; i < this->countBanks; i++) {
+		result += this->banks[i].getFullInfoBank() + "\n";
+	}
+	return result;
+}
+
+Bank* Banks::searchMaxPercent(const std::string& depositType) const {
+	std::string lowerDepositType = toLower(depositType);
+	float maxPercent = 0;
+	Bank* resultBank = nullptr;
+
+	for (int i = 0; i < this->countBanks; i++) {
+		for (int j = 0; j < this->banks[i].depositsCount; j++) {
+			std::string lowerType = this->banks[i].deposits[j].type;
+			if (lowerDepositType == lowerType) {
+				if (this->banks[i].deposits[j].percent > maxPercent) {
+					maxPercent = this->banks[i].deposits[j].percent;
+					resultBank = &(this->banks[i]);
+				}
+			}
+		}
+	}
+
+	return resultBank;
 }
 
 std::string toLower(const std::string& str) {

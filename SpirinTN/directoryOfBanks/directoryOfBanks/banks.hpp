@@ -1,5 +1,5 @@
-#ifndef AUXILIARY_H
-#define AUXILIARY_H
+#ifndef BANKS_H
+#define BANKS_H
 
 
 #include <string>
@@ -42,8 +42,8 @@ struct Banks {
 	Banks(const char* nameFile);
 	~Banks();
 
-	std::string getFullLustBanks() const;
-	Bank& searchMaxPercent(const std::string& depositType) const;
+	std::string getFullListBanks() const;
+	Bank* searchMaxPercent(const std::string& depositType) const;
 };
 
 std::string toLower(const std::string& str);
