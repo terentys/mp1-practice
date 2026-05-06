@@ -1,16 +1,15 @@
 #include <iostream>
 #include <string>
 #include <locale>
-#include <windows.h>
+
 
 #include "auxiliary.hpp"
 #include "banks.hpp"
 
 
 int main(int argc, char** argv) {
-    setlocale(LC_ALL, "rus");
-    SetConsoleOutputCP(1251);
-    SetConsoleCP(1251);
+	std::locale::global(std::locale("Russian"));
+	system("chcp 1251");
 
     if (argc < 2) {
 		printFrame();
@@ -22,9 +21,9 @@ int main(int argc, char** argv) {
 		Banks banks(argv[1]);
 		programCycle(banks);
 	}
-	catch (const char* ex) {
+	catch (const std::exception& ex) {
 		printFrame();
-		std::cout << ex;
+		std::cerr << ex.what();
 		return 1;
 	}
 

@@ -39,7 +39,7 @@ int inputOperation() {
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         }
-    } while (valid);
+    } while (!valid);
 
     return op;
 }
@@ -49,6 +49,7 @@ void programCycle(Banks& banks) {
 		printFrame();
 		std::cout << OPERATIONS;
 		int op = inputOperation();
+		std::cin.ignore();
 		if (op == 1) {
 			printListBanksInterface(banks);
 		}
@@ -63,26 +64,36 @@ void programCycle(Banks& banks) {
 
 void printListBanksInterface(Banks& banks) {
 	printFrame();
-	std::cout << banks.getFullListBanks();
+	std::cout << banks;
 	system("pause");
 }
 
 void searchMaxInterface(Banks& banks) {
 	printFrame();
-	std::string depositType = inputDepositType();
+	const std::string depositType = inputDepositType();
 	Bank* bank = banks.searchMaxPercent(depositType);
 	if (bank == nullptr) {
 		std::cout << "Банка с таким видом вклада не найдено!" << std::endl;
 	}
 	else {
-		std::cout << "Информация о банке с самым выгодным процентом на вид вклада \"" << depositType << "\":\n\n" << bank->getFullInfoBank() << std::endl;
+		std::cout << "\nИнформация о банке с самым выгодным процентом на вид вклада \"" << depositType << "\":\n\n" << *bank << std::endl;
 	}
 	system("pause");
 }
 
 std::string inputDepositType() {
+	bool valid = false;
 	std::string type;
-	std::cin.ignore();
-	std::getline(std::cin, type);
+
+	do {
+		std::cout << "Введите вид вклада: ";
+		std::getline(std::cin, type);
+		if (type.empty()) {
+			std::cout << "Вы ничего не ввели!" << std::endl;
+		}
+		else {
+			valid = true;
+		}
+	} while (!valid);
 	return type;
 }

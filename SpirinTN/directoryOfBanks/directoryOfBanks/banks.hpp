@@ -9,10 +9,11 @@ struct Deposit {
     std::string type;
     float percent;
 
-    Deposit() {};
+    Deposit() : type(""), percent(0.0f) {};
     Deposit(const std::string& type, const float percent);
 
-    std::string getFullInfoDeposit() const;
+    Deposit& operator= (const Deposit& d);
+    friend std::ostream& operator<< (std::ostream& os, const Deposit& d);
 };
 
 struct Bank {
@@ -21,31 +22,37 @@ struct Bank {
     Deposit* deposits;
     int depositsCount;
 
-    Bank() {};
-    Bank(const std::string& name, const std::string& ownership, const int depositsCount);
+    void _allocateDeposits(const std::string& strDeposits);
+
+    Bank() : name(""), ownership(""), deposits(nullptr), depositsCount(0) {};
+    Bank(const Bank&) = delete;
+    Bank& operator=(const Bank&) = delete;
     ~Bank();
 
     void stringToDeposit(std::string& string);
-    std::string getFullInfoBank() const;
-};
 
-bool isFloat(const std::string& str);
+    friend std::ostream& operator<< (std::ostream& os, const Bank& b);
+};
 
 struct Banks {
 	Bank *banks;
 	int countBanks;
 
-	int _getCountBanks(std::ifstream& file);
+	int _getCountBanks(std::ifstream& file) const;
 	void _stringToBank(std::ifstream& file);
 
-	Banks() {};
+	Banks() : banks(nullptr), countBanks(0) {};
 	Banks(const char* nameFile);
+    Banks(const Banks&) = delete;
+    Banks& operator=(const Banks&) = delete;
 	~Banks();
 
-	std::string getFullListBanks() const;
 	Bank* searchMaxPercent(const std::string& depositType) const;
+
+    friend std::ostream& operator<< (std::ostream& os, const Banks& bs);
 };
 
+bool isFloat(const std::string& str);
 std::string toLower(const std::string& str);
 
 #endif
