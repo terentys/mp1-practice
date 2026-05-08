@@ -9,7 +9,7 @@ struct Deposit {
     std::string type;
     float percent;
 
-    Deposit() : type(""), percent(0.0f) {};
+    Deposit() noexcept : type(""), percent(0.0f) {};
     Deposit(const std::string& type, const float percent);
 
     Deposit& operator= (const Deposit& d);
@@ -24,7 +24,7 @@ struct Bank {
 
     void _allocateDeposits(const std::string& strDeposits);
 
-    Bank() : name(""), ownership(""), deposits(nullptr), depositsCount(0) {};
+    Bank() noexcept : name(""), ownership(""), deposits(nullptr), depositsCount(0) {};
     Bank(const Bank&) = delete;
     Bank& operator=(const Bank&) = delete;
     ~Bank();
@@ -41,7 +41,7 @@ struct Banks {
 	int _getCountBanks(std::ifstream& file) const;
 	void _stringToBank(std::ifstream& file);
 
-	Banks() : banks(nullptr), countBanks(0) {};
+	Banks() noexcept : banks(nullptr), countBanks(0) {};
 	Banks(const char* nameFile);
     Banks(const Banks&) = delete;
     Banks& operator=(const Banks&) = delete;
