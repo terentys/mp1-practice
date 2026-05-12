@@ -124,12 +124,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="auxiliary.cpp" />
+    <ClCompile Include="bank.cpp" />
     <ClCompile Include="banks.cpp" />
+    <ClCompile Include="deposit.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="auxiliary.hpp" />
+    <ClInclude Include="bank.hpp" />
     <ClInclude Include="banks.hpp" />
+    <ClInclude Include="deposit.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
