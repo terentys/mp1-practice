@@ -11,7 +11,7 @@ Deposit::Deposit(const std::string& type, const float percent) {
     this->percent = percent;
 }
 
-Deposit& Deposit::operator= (const Deposit& d) {
+const Deposit& Deposit::operator= (const Deposit& d) {
 	this->type = d.type;
 	this->percent = d.percent;
 	return (*this);
@@ -22,44 +22,74 @@ std::ostream& operator<< (std::ostream& os, const Deposit& d) {
 	return os;
 }
 
-void Bank::_allocateDeposits(const std::string& strDeposits) {
-	int count = 0;
-	for (char c : strDeposits) {
-		if (c == ':') {
-			count++;
+void Bank::_copyFrom(const Bank& b) {
+	this->name = b.name;
+	this->ownership = b.ownership;
+
+	Deposit* newDeposits = nullptr;
+	try {
+		if (b.depositsCount > 0) {
+			newDeposits = new Deposit[b.depositsCount];
+			for (int i = 0; i < b.depositsCount; i++) {
+				newDeposits[i] = b.deposits[i];
+			}
 		}
 	}
-	this->depositsCount = count;
-	this->deposits = new Deposit[count];
+	catch (...) {
+		delete[] newDeposits;
+		throw std::runtime_error("Ошибка при выделении памяти!");
+	}
+
+	delete[] this->deposits;
+	this->deposits = newDeposits;
+	this->depositsCount = b.depositsCount;
+}
+
+Bank::Bank(const Bank& b) : deposits(nullptr), depositsCount(0) {
+	this->_copyFrom(b);
 }
 
 Bank::~Bank() {
     delete[] (this->deposits);
 }
 
-void Bank::stringToDeposit(std::string& string) {
-	this->_allocateDeposits(string);
+void Bank::stringToDeposit(const std::string& string) {
+	int count = 0;
+	for (char c : string) {
+		if (c == ':') {
+			count++;
+		}
+	}
+	this->depositsCount = count;
+	this->deposits = new Deposit[count];
+
+	std::string editableString = string;
     int idx = 0;
     while (true) {
-        size_t lenDepositSubStr = string.find(';');
-        std::string depositSumStr = lenDepositSubStr != std::string::npos ? string.substr(0, lenDepositSubStr) : string;
+        size_t lenDepositSubStr = editableString.find(';');
+        std::string depositSumStr = lenDepositSubStr != std::string::npos ? editableString.substr(0, lenDepositSubStr) : editableString;
 
 		size_t idxColons = depositSumStr.find(':');
-        if (idxColons == std::string::npos || !isFloat(depositSumStr.substr(idxColons + 1))) {
-            throw std::runtime_error("Информация о депозитах некорректна! (1)");
-        }
-
-        const std::string type = depositSumStr.substr(0, idxColons);
-        const float percent = std::stof(depositSumStr.substr(idxColons + 1));
-        (this->deposits)[idx++] = Deposit(type, percent);
+		try {
+			const std::string type = depositSumStr.substr(0, idxColons);
+			const float percent = std::stof(depositSumStr.substr(idxColons + 1));
+			(this->deposits)[idx++] = Deposit(type, percent);
+		}
+		catch (...) {
+			throw std::runtime_error("Информация о депозитах некорректна! (1)");
+		}
 
         if (lenDepositSubStr != std::string::npos) {
-            string = string.substr(lenDepositSubStr + 1);
+			editableString = editableString.substr(lenDepositSubStr + 1);
         }
         else {
             break;
         }
     }
+}
+
+const Bank& Bank::operator=(const Bank& b) {
+	this->_copyFrom(b);
 }
 
 std::ostream& operator<< (std::ostream& os, const Bank& b) {
@@ -70,23 +100,15 @@ std::ostream& operator<< (std::ostream& os, const Bank& b) {
 	return os;
 }
 
-bool isFloat(const std::string& str) {
-    std::istringstream iss(str);
-    float value;
-    char leftover;
-
-    if (iss >> value) {
-        return !(iss >> leftover);
-    }
-    return false;
-}
-
 int Banks::_getCountBanks(std::ifstream& file) const {
 	int count = 0;
 	std::string line;
 	while (std::getline(file, line)) {
 		count++;
 	}
+
+	file.clear();
+	file.seekg(0, std::ios::beg);
 	return count;
 }
 
@@ -114,6 +136,26 @@ void Banks::_stringToBank(std::ifstream& file) {
 	}
 }
 
+void Banks::_copyFrom(const Banks& b) {
+	Bank* newBanks = nullptr;
+	try {
+		if (b.countBanks > 0) {
+			newBanks = new Bank[b.countBanks];
+			for (int i = 0; i < b.countBanks; i++) {
+				newBanks[i] = b.banks[i];
+			}
+		}
+	}
+	catch (...) {
+		delete[] newBanks;
+		throw std::runtime_error("Ошибка при выделении памяти!");
+	}
+
+	delete[] this->banks;
+	this->banks = newBanks;
+	this->countBanks = b.countBanks;
+}
+
 Banks::Banks(const char* nameFile) {
 	std::ifstream file(nameFile);
 	if (!file) {
@@ -121,15 +163,21 @@ Banks::Banks(const char* nameFile) {
 	}
 
 	this->countBanks = this->_getCountBanks(file);
-	file.clear();
-	file.seekg(0, std::ios::beg);
 
 	this->banks = new Bank[this->countBanks];
 	this->_stringToBank(file);
 }
 
+Banks::Banks(const Banks& b) : banks(nullptr), countBanks(0) {
+	this->_copyFrom(b);
+}
+
 Banks::~Banks() {
 	delete[] (this->banks);
+}
+
+const Banks& Banks::operator=(const Banks& b) {
+	this->_copyFrom(b);
 }
 
 std::ostream& operator<< (std::ostream& os, const Banks& bs) {
