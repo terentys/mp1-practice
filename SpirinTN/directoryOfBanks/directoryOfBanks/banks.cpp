@@ -229,6 +229,19 @@ Bank* Banks::searchMaxPercent(const std::string& depositType) const {
 	return resultBank;
 }
 
+Banks Banks::searchBanksWithDeposit(const std::string& depositType) const {
+	int countBanksWithDeposit = 0;
+	for (int i = 0; i < this->countBanks; i++) {
+		if (this->banks[i].findDeposit(depositType) != -1) {
+			countBanksWithDeposit++;
+		}
+	}
+}
+
+Banks Banks::searchBanksWithOwnership(const std::string& ownership) const {
+
+}
+
 Banks& Banks::operator=(const Banks& b) {
 	this->_copyFrom(b);
 	return *this;
@@ -239,6 +252,18 @@ Bank& Banks::operator[](const int index) {
 		throw std::runtime_error("Выход за пределы массива!");
 	}
 	return this->banks[index];
+}
+
+Banks Banks::operator|(const Banks& b) {
+	throw std::runtime_error("Нет реализации!");
+}
+
+Banks Banks::operator&(const Banks& b) {
+	throw std::runtime_error("Нет реализации!");
+}
+
+Banks Banks::operator-(const Banks& b) {
+	throw std::runtime_error("Нет реализации!");
 }
 
 std::istream& operator>> (std::istream& is, Banks& b) {
