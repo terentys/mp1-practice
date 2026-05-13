@@ -3,10 +3,16 @@
 
 #include "deposit.hpp"
 
+enum OwnershipType {
+	OOO,
+	AO,
+	PAO,
+};
+
 class Bank {
 private:
     std::string name;
-    std::string ownership;
+    std::string ownership; // OwnershipType
     Deposit* deposits;
     int depositsCount;
 
