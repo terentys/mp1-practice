@@ -3,9 +3,6 @@
 
 #include "bank.hpp"
 
-const std::string Bank::LIST_OWNERSHIP = ";АО;ПАО;ООО;";
-const int Bank::MAX_COUNT = 10000;
-
 int Bank::_findCountDeposits(const std::string& string) {
     int count = 0;
     for (char c : string) {
@@ -28,10 +25,18 @@ void Bank::_copyFrom(const Bank& b) {
     }
 }
 
-Bank::Bank(const std::string& name, const std::string& ownership, const int depositsCount) : deposits(nullptr), depositsCount(0) {
-    this->setName(name);
-    this->setOwnership(ownership);
-    this->allocateDeposits(depositsCount);
+const char* Bank::_ownershipTypeToStr(const OwnershipType type) const {
+    switch (type) {
+    case OOO:
+        return "ООО";
+        break;
+    case AO:
+        return "АО";
+        break;
+    case PAO:
+        return "ПАО";
+        break;
+    }
 }
 
 Bank::Bank(const Bank& b) : deposits(nullptr), depositsCount(0) {
@@ -46,21 +51,20 @@ void Bank::setName(const std::string& name) {
     if (name.empty()) {
         throw std::runtime_error("Название банка не может быть пустым!");
     }
-    else if (name.length() > 256) {
-        throw std::runtime_error("Название банка слишком длинное!");
-    }
     this->name = name;
 }
 
 void Bank::setOwnership(const std::string& ownership) {
-    if (LIST_OWNERSHIP.find(";" + ownership + ";") == std::string::npos) {
-        throw std::runtime_error("Такого общества не существует!");
-    }
-    this->ownership = ownership;
+    OwnershipType type;
+    if (ownership == "АО") type = AO;
+    else if (ownership == "ПАО") type = PAO;
+    else if (ownership == "ООО") type = OOO;
+    else throw;
+    this->ownership = type;
 }
 
 void Bank::allocateDeposits(const int count) {
-    if (count < 0 && count > this->MAX_COUNT) {
+    if (count < 0 && count) {
         throw std::runtime_error("Недопустимый размер массива депозитов");
     }
 
@@ -160,14 +164,24 @@ void Bank::stringToBank(std::string& string) {
     if (splitIndex == std::string::npos) {
         throw std::runtime_error("Строка банка некорректна! (отсутствует форма собственности)");
     }
-    this->setName( string.substr(0, splitIndex) );
+    try {
+        this->setName(string.substr(0, splitIndex));
+    }
+    catch (...) {
+        throw std::runtime_error("Строка банка некорректна! (название банка отсутствует)");
+    }
     string = string.substr(splitIndex + 1);
 
     splitIndex = string.find(';');
     if (splitIndex == std::string::npos) {
         throw std::runtime_error("Строка банка некорректна! (отсутствует перечисление депозитов)");
     }
-    this->setOwnership( string.substr(0, splitIndex) );
+    try {
+        this->setOwnership( string.substr(0, splitIndex) );
+    }
+    catch (...) {
+        throw std::runtime_error("Строка банка некорректна! (неправильная форма собственности)");
+    }
     string = string.substr(splitIndex + 1);
 
     try {
@@ -182,7 +196,7 @@ const std::string& Bank::getName() const noexcept {
     return this->name;
 }
 
-const std::string& Bank::getOwnership() const noexcept {
+OwnershipType Bank::getOwnership() const noexcept {
     return this->ownership;
 }
 
@@ -204,166 +218,14 @@ int Bank::findDeposit(const std::string& type) const {
     return -1;
 }
 
-void Bank::removeDeposit() {
-    if (this->depositsCount == 0) {
-        throw std::runtime_error("Депозитов у банка нет!");
-    }
-
-    Deposit* copyDeposits = new Deposit[this->depositsCount - 1];
-    try {
-        for (int i = 0; i < this->depositsCount - 1; i++) {
-            copyDeposits[i] = this->deposits[i];
-        }
-    }
-    catch (...) {
-        delete[] copyDeposits;
-        throw std::runtime_error("Ошибка при удалении депозита!");
-    }
-
-    delete[] this->deposits;
-    this->deposits = copyDeposits;
-    --(this->depositsCount);
-}
-
-void Bank::removeDeposit(const int index) {
-    if (index < 0 || index > this->depositsCount - 1) {
-        throw std::runtime_error("Депозита с таким индексом нет!");
-    }
-
-    Deposit* copyDeposits = new Deposit[this->depositsCount - 1];
-    try {
-        int k;
-        for (k = 0; k < index && k < this->depositsCount - 1; k++) {
-            copyDeposits[k] = this->deposits[k];
-        }
-        for (; k < this->depositsCount - 1; k++) {
-            copyDeposits[k] = this->deposits[k + 1];
-        }
-    }
-    catch (...) {
-        delete[] copyDeposits;
-        throw std::runtime_error("Ошибка при удалении депозита!");
-    }
-
-    delete[] this->deposits;
-    this->deposits = copyDeposits;
-    --(this->depositsCount);
-}
-
-void Bank::removeDeposit(const std::string& type) {
-    int indexDeposit = this->findDeposit(type);
-    if (indexDeposit == -1) {
-        throw std::runtime_error("Депозита с таким названием нет!");
-    }
-    this->removeDeposit(indexDeposit);
-}
-
-void Bank::addDeposit(const Deposit& d) {
-    if (this->depositsCount + 1 > MAX_COUNT) {
-        throw std::runtime_error("У банка максимум депозитов!");
-    }
-
-    if (findDeposit(d.getType()) != -1) {
-        throw std::runtime_error("Депозит с названием \"" + d.getType() + "\" уже существует!");
-    }
-
-    Deposit* copyDeposits = new Deposit[this->depositsCount + 1];
-    try {
-        for (int i = 0; i < this->depositsCount; i++) {
-            copyDeposits[i] = this->deposits[i];
-        }
-        copyDeposits[this->depositsCount] = d;
-    }
-    catch (...) {
-        delete[] copyDeposits;
-        throw std::runtime_error("Ошибка при добавлении депозита!");
-    }
-
-    delete[] this->deposits;
-    this->deposits = copyDeposits;
-    ++(this->depositsCount);
-}
-
-void Bank::addDeposit(const Deposit& d, const int index) {
-    if (index < 0 || index > this->depositsCount || index >= MAX_COUNT) {
-        throw std::runtime_error("Недопустимая позиция для добавления депозита!");
-    }
-
-    if (findDeposit(d.getType()) != -1) {
-        throw std::runtime_error("Депозит с названием \"" + d.getType() + "\" уже существует!");
-    }
-
-    Deposit* copyDeposits = new Deposit[this->depositsCount + 1];
-    try {
-        int k;
-        for (k = 0; k < index && k < this->depositsCount; k++) {
-            copyDeposits[k] = this->deposits[k];
-        }
-        copyDeposits[k++] = d;
-        for (; k < this->depositsCount; k++) {
-            copyDeposits[k] = this->deposits[k - 1];
-        }
-    }
-    catch (...) {
-        delete[] copyDeposits;
-        throw std::runtime_error("Ошибка при добавлении депозита!");
-    }
-
-    delete[] this->deposits;
-    this->deposits = copyDeposits;
-    ++(this->depositsCount);
-}
-
-Deposit& Bank::getDepositForEdit(const int index) {
-    if (index < 0 || index >= this->depositsCount) {
-        throw std::runtime_error("Депозита с таким индексом нет!");
-    }
-    return this->deposits[index];
-}
-
-Deposit& Bank::getDepositForEdit(const std::string& type) {
-    int index = this->findDeposit(type);
-    if (index == -1) {
-        throw std::runtime_error("Депозита с таким названием нет!");
-    }
-    return this->deposits[index];
-}
-
-const Deposit* Bank::getMaxPercentDeposit() const {
-    Deposit* ptrDeposit = nullptr;
-    float maxPercent = 0.0f;
-    for (int i = 0; i < this->depositsCount; i++) {
-        if (this->deposits[i].getPercent() > maxPercent) {
-            maxPercent = this->deposits[i].getPercent();
-            ptrDeposit = &(this->deposits[i]);
-        }
-    }
-    return ptrDeposit;
-}
-
-Bank& Bank::operator=(const Bank& b) {
+const Bank& Bank::operator=(const Bank& b) {
+    if (this == &b) return *this;
     this->_copyFrom(b);
     return *this;
 }
 
-std::istream& Bank::inputDeposits(std::istream& is) {
-    std::string inputLine;
-    if (std::getline(is, inputLine)) {
-        this->stringToDeposits(inputLine);
-    }
-    return is;
-}
-
-std::istream& operator>> (std::istream& is, Bank& d) {
-    std::string inputLine;
-    if (std::getline(is, inputLine)) {
-        d.stringToBank(inputLine);
-    }
-    return is;
-}
-
 std::ostream& operator<< (std::ostream& os, const Bank& b) {
-    os << '[' << b.name << ']' << "\nФорма собственности: " << b.ownership << "\nВклады:\n";
+    os << '[' << b.name << ']' << "\nФорма собственности: " << b._ownershipTypeToStr(b.ownership) << "\nВклады:\n";
     for (int i = 0; i < b.depositsCount; i++) {
         os << "   " << b.deposits[i] << "\n";
     }

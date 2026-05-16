@@ -12,7 +12,6 @@ const char* MAIN_FRAME =
 const char* OPERATIONS =
 "1. Показать список банков\n"
 "2. Найти банк с максимальным процентом для вклада\n"
-"3. Демо функционала классов Deposit, Bank, Banks\n"
 "0. Выход\n\n";
 
 void printFrame() {
@@ -27,7 +26,7 @@ int inputOperation() {
     do {
         std::cout << "Введите операцию: ";
         if (std::cin >> op) {
-            if (op >= 0 && op <= 3) {
+            if (op >= 0 && op <= 2) {
                 valid = true;
             }
             else {
@@ -56,9 +55,6 @@ void programCycle(Banks& banks) {
 		}
 		else if (op == 2) {
 			searchMaxInterface(banks);
-		}
-		else if (op == 3) {
-			system("pause");
 		}
 		else {
 			break;

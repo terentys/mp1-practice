@@ -4,6 +4,7 @@
 #include "deposit.hpp"
 
 enum OwnershipType {
+    NOT_OWNED = -1,
 	OOO,
 	AO,
 	PAO,
@@ -12,18 +13,15 @@ enum OwnershipType {
 class Bank {
 private:
     std::string name;
-    std::string ownership; // OwnershipType
+    OwnershipType ownership;
     Deposit* deposits;
     int depositsCount;
 
     int _findCountDeposits(const std::string& string);
     void _copyFrom(const Bank& b);
-
-    static const std::string LIST_OWNERSHIP;
-    static const int MAX_COUNT;
+    const char* _ownershipTypeToStr(const OwnershipType type) const;
 public:
-    Bank() noexcept : name(""), ownership(""), deposits(nullptr), depositsCount(0) {};
-    Bank(const std::string& name, const std::string& ownership, const int depositsCount);
+    Bank() noexcept : name(""), ownership(NOT_OWNED), deposits(nullptr), depositsCount(0) {};
     Bank(const Bank& b);
     ~Bank() noexcept;
 
@@ -35,25 +33,13 @@ public:
     void stringToBank(std::string& string);
 
     const std::string& getName() const noexcept;
-    const std::string& getOwnership() const noexcept;
+    OwnershipType getOwnership() const noexcept;
     const Deposit* getDeposits() const noexcept;
     int getDepositsCount() const noexcept;
 
     int findDeposit(const std::string& type) const;
-    void removeDeposit();
-    void removeDeposit(const int index);
-    void removeDeposit(const std::string& type);
-    void addDeposit(const Deposit& d);
-    void addDeposit(const Deposit& d, const int index);
 
-    Deposit& getDepositForEdit(const int index);
-    Deposit& getDepositForEdit(const std::string& type);
-
-    const Deposit* getMaxPercentDeposit() const;
-
-    Bank& operator=(const Bank& b);
-    std::istream& inputDeposits(std::istream& is);
-    friend std::istream& operator>> (std::istream& is, Bank& d);
+    const Bank& operator=(const Bank& b);
     friend std::ostream& operator<< (std::ostream& os, const Bank& b);
 };
 

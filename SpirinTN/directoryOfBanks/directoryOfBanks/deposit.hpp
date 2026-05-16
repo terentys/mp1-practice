@@ -20,10 +20,7 @@ public:
     const std::string& getType() const noexcept;
     float getPercent() const noexcept;
 
-    float changeBid(const float changeStep);
-
-    Deposit& operator= (const Deposit& d);
-    friend std::istream& operator>> (std::istream& is, Deposit& d);
+    const Deposit& operator= (const Deposit& d);
     friend std::ostream& operator<< (std::ostream& os, const Deposit& d);
     
 };

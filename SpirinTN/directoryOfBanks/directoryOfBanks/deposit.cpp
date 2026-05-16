@@ -14,9 +14,6 @@ void Deposit::setType(const std::string& type) {
 	if (type.empty()) {
 		throw std::runtime_error("Ќазвание вида вклада не может быть пустым!");
 	}
-	else if (type.length() > 256) {
-		throw std::runtime_error("Ќазвание вида вклада слишком длинное!");
-	}
 	this->type = type;
 }
 
@@ -52,12 +49,7 @@ float Deposit::getPercent() const noexcept {
 	return this->percent;
 }
 
-float Deposit::changeBid(const float changeStep) {
-	setPercent(this->percent + changeStep);
-	return this->percent;
-}
-
-Deposit& Deposit::operator= (const Deposit& d) {
+const Deposit& Deposit::operator= (const Deposit& d) {
 	this->type = d.getType();
 	this->percent = d.getPercent();
 	return (*this);
@@ -66,12 +58,4 @@ Deposit& Deposit::operator= (const Deposit& d) {
 std::ostream& operator<< (std::ostream& os, const Deposit& d) {
 	os << d.type << ": " << std::fixed << std::setprecision(2) << d.percent << "%";
 	return os;
-}
-
-std::istream& operator>> (std::istream& is, Deposit& d) {
-	std::string inputLine;
-	if (std::getline(is, inputLine)) {
-		d.stringToDeposit(inputLine);
-	}
-	return is;
 }
