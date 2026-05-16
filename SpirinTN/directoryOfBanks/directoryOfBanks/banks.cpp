@@ -12,6 +12,7 @@ Deposit::Deposit(const std::string& type, const float percent) {
 }
 
 const Deposit& Deposit::operator= (const Deposit& d) {
+	if (this == &d) return *this;
 	this->type = d.type;
 	this->percent = d.percent;
 	return (*this);
@@ -89,7 +90,9 @@ void Bank::stringToDeposit(const std::string& string) {
 }
 
 const Bank& Bank::operator=(const Bank& b) {
+	if (this == &b) return *this;
 	this->_copyFrom(b);
+	return *this;
 }
 
 std::ostream& operator<< (std::ostream& os, const Bank& b) {
@@ -177,7 +180,9 @@ Banks::~Banks() {
 }
 
 const Banks& Banks::operator=(const Banks& b) {
+	if (this == &b) return *this;
 	this->_copyFrom(b);
+	return *this;
 }
 
 std::ostream& operator<< (std::ostream& os, const Banks& bs) {
