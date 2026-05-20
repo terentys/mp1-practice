@@ -12,7 +12,7 @@ private:
 	void _copyFrom(const Banks& b);
 public:
 	Banks() noexcept : banks(nullptr), countBanks(0) {};
-	Banks(const char* nameFile);
+	Banks(const std::string& nameFile);
     Banks(const Banks& b);
 	~Banks() noexcept;
 

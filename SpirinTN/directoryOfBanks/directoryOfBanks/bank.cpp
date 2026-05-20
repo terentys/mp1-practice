@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cctype>
 
 #include "bank.hpp"
 
@@ -16,7 +17,7 @@ int Bank::_findCountDeposits(const std::string& string) {
 void Bank::_copyFrom(const Bank& b) {
     this->name = b.getName();
     this->ownership = b.getOwnership();
-    delete[] this->deposits;
+    if (this->deposits != nullptr) delete[] this->deposits;
     this->deposits = nullptr;
     this->depositsCount = 0;
     this->allocateDeposits(b.getDepositsCount());
@@ -44,7 +45,7 @@ Bank::Bank(const Bank& b) : deposits(nullptr), depositsCount(0) {
 }
 
 Bank::~Bank() noexcept {
-    delete[](this->deposits);
+    if(this->deposits != nullptr) delete[](this->deposits);
 }
 
 void Bank::setName(const std::string& name) {
@@ -75,11 +76,11 @@ void Bank::allocateDeposits(const int count) {
         }
     }
     catch (...) {
-        delete[] newDeposits;
+        if (newDeposits != nullptr) delete[] newDeposits;
         throw std::runtime_error("Ошибка выделения памяти!");
     }
 
-    delete[](this->deposits);
+    if (this->deposits != nullptr) delete[](this->deposits);
     this->deposits = newDeposits;
     this->depositsCount = count;
 }
@@ -88,7 +89,7 @@ void Bank::stringToDeposits(std::string& string) {
     int maxCount = _findCountDeposits(string);
 
     if (maxCount == 0) {
-        delete[] deposits;
+        if (deposits != nullptr) delete[] deposits;
         deposits = nullptr;
         depositsCount = 0;
         return;
@@ -130,11 +131,11 @@ void Bank::stringToDeposits(std::string& string) {
         }
     }
     catch (const std::bad_alloc& ex) {
-        delete[] parsed;
+        if (parsed != nullptr) delete[] parsed;
         throw std::runtime_error("Ошибка выделения памяти!");
     }
     catch (...) {
-        delete[] parsed;
+		if (parsed != nullptr) delete[] parsed;
         throw std::runtime_error("Некорректна строка депозита!");
     }
 
@@ -148,13 +149,13 @@ void Bank::stringToDeposits(std::string& string) {
         }
     }
     catch (...) {
-        delete[] newDeposits;
-        delete[] parsed;
+        if (newDeposits != nullptr) delete[] newDeposits;
+		if (parsed != nullptr) delete[] parsed;
         throw std::runtime_error("Ошибка выделения памяти!");
     }
 
-    delete[] parsed;
-    delete[] deposits;
+    if (parsed != nullptr) delete[] parsed;
+	if (deposits != nullptr) delete[] deposits;
     deposits = newDeposits;
     depositsCount = idx;
 }

@@ -14,7 +14,7 @@ int Banks::_getCountBanksFromStream(std::istream& stream) const {
 }
 
 void Banks::_copyFrom(const Banks& b) {
-	delete[] this->banks;
+	if (this->banks != nullptr) delete[] this->banks;
 	this->banks = nullptr;
 	this->countBanks = 0;
 	allocateBanks(b.getCountBanks());
@@ -27,7 +27,7 @@ Banks::Banks(const Banks& b) : banks(nullptr), countBanks(0) {
 	this->_copyFrom(b);
 }
 
-Banks::Banks(const char* nameFile) {
+Banks::Banks(const std::string& nameFile) {
 	std::ifstream file(nameFile);
 	if (!file) {
 		throw std::runtime_error("Не удалось открыть файл!");
@@ -41,7 +41,7 @@ Banks::Banks(const char* nameFile) {
 }
 
 Banks::~Banks() noexcept {
-	delete[] (this->banks);
+	if (this->banks != nullptr) delete[] (this->banks);
 }
 
 void Banks::allocateBanks(const int count) {
@@ -56,7 +56,7 @@ void Banks::allocateBanks(const int count) {
 		}
 	}
 	catch (...) {
-		delete[] newBanks;
+		if (newBanks != nullptr) delete[] newBanks;
 		throw std::runtime_error("Ошибка выделения памяти!");
 	}
 
