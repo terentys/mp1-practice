@@ -37,7 +37,7 @@ void Bank::_copyFrom(const Bank& b) {
 		}
 	}
 	catch (...) {
-		delete[] newDeposits;
+		if (newDeposits != nullptr) delete[] newDeposits;
 		throw std::runtime_error("Ошибка при выделении памяти!");
 	}
 
@@ -150,7 +150,7 @@ void Banks::_copyFrom(const Banks& b) {
 		}
 	}
 	catch (...) {
-		delete[] newBanks;
+		if (newBanks != nullptr) delete[] newBanks;
 		throw std::runtime_error("Ошибка при выделении памяти!");
 	}
 
@@ -159,7 +159,7 @@ void Banks::_copyFrom(const Banks& b) {
 	this->countBanks = b.countBanks;
 }
 
-Banks::Banks(const char* nameFile) {
+Banks::Banks(const std::string& nameFile) {
 	std::ifstream file(nameFile);
 	if (!file) {
 		throw std::runtime_error("Не удалось открыть файл!");
