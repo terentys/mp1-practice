@@ -41,7 +41,7 @@ void Bank::_copyFrom(const Bank& b) {
 		throw std::runtime_error("Ошибка при выделении памяти!");
 	}
 
-	delete[] this->deposits;
+	if (this->deposits != nullptr) delete[] this->deposits;
 	this->deposits = newDeposits;
 	this->depositsCount = b.depositsCount;
 }
@@ -51,7 +51,7 @@ Bank::Bank(const Bank& b) : deposits(nullptr), depositsCount(0) {
 }
 
 Bank::~Bank() {
-    delete[] (this->deposits);
+	if (this->deposits != nullptr) delete[] (this->deposits);
 }
 
 void Bank::stringToDeposit(const std::string& string) {
@@ -154,7 +154,7 @@ void Banks::_copyFrom(const Banks& b) {
 		throw std::runtime_error("Ошибка при выделении памяти!");
 	}
 
-	delete[] this->banks;
+	if (this->banks != nullptr) delete[] this->banks;
 	this->banks = newBanks;
 	this->countBanks = b.countBanks;
 }
@@ -176,7 +176,7 @@ Banks::Banks(const Banks& b) : banks(nullptr), countBanks(0) {
 }
 
 Banks::~Banks() {
-	delete[] (this->banks);
+	if (this->banks != nullptr) delete[] (this->banks);
 }
 
 const Banks& Banks::operator=(const Banks& b) {
