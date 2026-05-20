@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "container.hpp"
 
@@ -74,7 +75,7 @@ int main() {
 
     std::cout << containerPtrsStr1.getCount() << std::endl;
     for (int i = 0; i < containerPtrsStr1.getCount(); i++) {
-        std::cout << *containerPtrsStr1[i] << " ";
+        std::cout << *(containerPtrsStr1[i]) << " ";
     }
     std::cout << std::endl;
     std::cout << containerPtrsStr1.findElement("gav") << std::endl;

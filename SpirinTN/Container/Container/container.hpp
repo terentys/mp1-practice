@@ -10,6 +10,8 @@ private:
     int size;
     int count;
     int stepIncreasing;
+
+	void reallocContainer(const int newSize);
 public:
     Container() noexcept : elements(nullptr), size(0), count(0), stepIncreasing(1) {};
     Container(const int size, const int stepIncreasing = 1);
@@ -17,9 +19,7 @@ public:
     ~Container();
 
     int getSize();
-    int getCount();
-
-    void reallocContainer(const int newSize);
+    int getCount();   
 
     int findElement(const T& elem) const;
     void addElement(const T& elem, int pos = -1);
